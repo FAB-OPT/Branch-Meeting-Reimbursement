@@ -1,0 +1,1227 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ระบบส่งเอกสารเบิกเงิน ประชุมสาขา</title>
+
+  <!-- Sarabun (required) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#2f67c8;
+      --bg2:#5d86d8;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --text:#0f172a;
+      --primary:#2563eb;
+      --primary2:#1d4ed8;
+      --danger:#ef4444;
+      --warning:#f59e0b;
+      --success:#16a34a;
+      --line:#e5e7eb;
+      --shadow:0 18px 50px rgba(15, 23, 42, .20);
+      --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"Sarabun", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:var(--text);
+      background: linear-gradient(160deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .wrap{
+      width:min(980px, 100%);
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:18px;
+      align-items:stretch;
+    }
+    @media (max-width: 860px){
+      .wrap{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px 22px 18px;
+      overflow:hidden;
+    }
+
+    .top-logos{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:22px;
+      padding:10px 0 6px;
+      flex-wrap:wrap;
+    }
+    .logo{
+      height:46px;
+      width:auto;
+      object-fit:contain;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.06));
+    }
+    .title{
+      text-align:center;
+      font-size:24px;
+      font-weight:700;
+      margin:8px 0 4px;
+      color:#1f4aa5;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      text-align:center;
+      font-size:14px;
+      color:var(--muted);
+      margin:0 0 16px;
+    }
+
+    .row{ display:flex; gap:10px; align-items:center; }
+    .col{ display:flex; flex-direction:column; gap:8px; }
+    .sp{ height:12px; }
+
+    label{ font-size:13px; color:#334155; font-weight:600; }
+    input, textarea, select{
+      font-family:"Sarabun", sans-serif;
+      font-size:15px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:11px 12px;
+      outline:none;
+      background:#f8fafc;
+      transition:.15s ease;
+      width:100%;
+    }
+    input:focus, textarea:focus, select:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 4px rgba(59,130,246,.15);
+      background:#fff;
+    }
+    textarea{ min-height:88px; resize:vertical; }
+
+    .btn{
+      border:0;
+      background:var(--primary);
+      color:#fff;
+      padding:12px 14px;
+      border-radius:12px;
+      font-weight:700;
+      font-size:15px;
+      cursor:pointer;
+      transition:.15s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      user-select:none;
+    }
+    .btn:hover{ background:var(--primary2); transform: translateY(-1px); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
+    .btn.ghost{
+      background:transparent;
+      border:1px solid var(--line);
+      color:#0f172a;
+    }
+    .btn.ghost:hover{ background:#f1f5f9; transform:none; }
+
+    .btn.danger{ background: var(--danger); }
+    .btn.danger:hover{ filter: brightness(.95); }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      background:#f1f5f9;
+      color:#0f172a;
+      font-size:13px;
+      font-weight:700;
+      border:1px solid var(--line);
+    }
+    .pill small{ color:var(--muted); font-weight:600; }
+
+    .alert{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid;
+      font-size:14px;
+      line-height:1.35;
+      margin-top:10px;
+      display:none;
+    }
+    .alert.show{ display:block; }
+    .alert.err{ background:#fff1f2; border-color:#fecdd3; color:#9f1239; }
+    .alert.ok{ background:#ecfdf5; border-color:#bbf7d0; color:#065f46; }
+    .alert.warn{ background:#fffbeb; border-color:#fde68a; color:#92400e; }
+
+    .foot{
+      text-align:center;
+      color:#475569;
+      font-size:12px;
+      margin-top:16px;
+    }
+
+    .side h3{
+      margin:0 0 10px;
+      font-size:16px;
+      color:#0f172a;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .kpi{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+    }
+    .kpi .k{ font-size:12px; color:var(--muted); font-weight:700; }
+    .kpi .v{ font-size:22px; font-weight:800; margin-top:2px; }
+
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .table th, .table td{
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      font-size:13px;
+      text-align:left;
+      vertical-align:top;
+    }
+    .table th{
+      background:#f8fafc;
+      color:#334155;
+      font-weight:800;
+    }
+    .table tr:hover td{ background:#f8fafc; cursor:pointer; }
+    .badge{
+      font-weight:800;
+      font-size:12px;
+      padding:5px 9px;
+      border-radius:999px;
+      display:inline-block;
+      border:1px solid;
+    }
+    .b-pending{ background:#fffbeb; border-color:#fde68a; color:#92400e; }
+    .b-done{ background:#ecfdf5; border-color:#bbf7d0; color:#065f46; }
+    .b-reject{ background:#fff1f2; border-color:#fecdd3; color:#9f1239; }
+    .b-other{ background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8; }
+
+    .imgs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+    .thumb{
+      width:84px; height:84px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      position:relative;
+    }
+    .thumb img{ width:100%; height:100%; object-fit:cover; }
+    .thumb button{
+      position:absolute;
+      top:6px; right:6px;
+      width:22px; height:22px;
+      border-radius:999px;
+      border:0;
+      background:rgba(0,0,0,.55);
+      color:#fff;
+      cursor:pointer;
+      font-weight:900;
+      line-height:22px;
+    }
+
+    /* Modal */
+    .modal-back{
+      position:fixed;
+      inset:0;
+      background:rgba(2,6,23,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      z-index:50;
+    }
+    .modal-back.show{ display:flex; }
+    .modal{
+      width:min(820px, 100%);
+      background:#fff;
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .modal-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px;
+      background:#f8fafc;
+      border-bottom:1px solid var(--line);
+    }
+    .modal-head b{ font-size:14px; }
+    .modal-body{ padding:16px; }
+    .modal-close{
+      background:transparent;
+      border:0;
+      cursor:pointer;
+      font-size:22px;
+      line-height:1;
+      padding:4px 8px;
+    }
+    .modal-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 860px){
+      .modal-grid{ grid-template-columns: 1fr; }
+    }
+
+    .muted{ color:var(--muted); }
+    .hr{ height:1px; background:var(--line); margin:12px 0; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- MAIN -->
+    <div class="card" id="mainCard">
+      <div class="top-logos">
+        <!-- เปลี่ยนเป็นโลโก้จริงของคุณได้เลย -->
+        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Logo-placeholder.svg/256px-Logo-placeholder.svg.png" alt="Logo 1">
+        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Logo-placeholder.svg/256px-Logo-placeholder.svg.png" alt="Logo 2">
+        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Logo-placeholder.svg/256px-Logo-placeholder.svg.png" alt="Logo 3">
+      </div>
+
+      <div class="title">ระบบส่งเอกสารเบิกเงิน ประชุมสาขา</div>
+      <div class="subtitle">กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</div>
+
+      <!-- LOGIN -->
+      <div id="loginView">
+        <div class="col">
+          <label>URL Web App (Apps Script /exec)</label>
+          <input id="apiUrl" placeholder="วาง URL ที่ลงท้ายด้วย /exec เช่น https://script.google.com/macros/s/....../exec" />
+          <div class="row">
+            <div style="flex:1">
+              <label>รหัสสาขา / รหัสแอดมิน</label>
+              <input id="loginCode" inputmode="numeric" placeholder="เช่น 601183 หรือ 5001" />
+            </div>
+            <div style="width: 160px; align-self:end;">
+              <button class="btn" id="btnLogin">เข้าสู่ระบบ</button>
+            </div>
+          </div>
+
+          <div class="alert err" id="loginErr"></div>
+          <div class="alert ok" id="loginOk"></div>
+
+          <div class="foot">
+            Prepared by Operations Department, FAB Food Holding<br/>
+            <span class="muted" id="verText">Version 1.0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- APP -->
+      <div id="appView" style="display:none;">
+        <div class="row" style="justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div class="row" style="gap:10px; flex-wrap:wrap;">
+            <span class="pill" id="pillUser">👤 <span id="userName">-</span> <small id="userRole">-</small></span>
+            <span class="pill">🗓️ <span id="cycleName">-</span></span>
+          </div>
+          <div class="row">
+            <button class="btn ghost" id="btnReload">รีเฟรช</button>
+            <button class="btn ghost" id="btnLogout">ออกจากระบบ</button>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- Branch panel -->
+        <div id="branchPanel" style="display:none;">
+          <h3 style="margin:0 0 10px;">ส่งเอกสารเบิกเงิน</h3>
+
+          <div class="modal-grid">
+            <div class="col">
+              <label>ชื่อผู้เบิก</label>
+              <input id="claimantName" placeholder="ชื่อ-สกุล" />
+
+              <label>จำนวนเงิน (บาท)</label>
+              <input id="amount" inputmode="decimal" placeholder="เช่น 1200" />
+
+              <label>หมายเหตุ</label>
+              <textarea id="note" placeholder="รายละเอียดเพิ่มเติม (ถ้ามี)"></textarea>
+
+              <label>รูปประกอบ (ไม่เกิน 3 รูป) — ระบบจะบีบอัดให้เบาอัตโนมัติ</label>
+              <input id="imgInput" type="file" accept="image/*" multiple />
+
+              <div class="imgs" id="imgPreview"></div>
+
+              <div class="row" style="margin-top:8px;">
+                <button class="btn" id="btnSubmit">ส่งเอกสาร</button>
+                <button class="btn ghost" id="btnClearForm">ล้างฟอร์ม</button>
+              </div>
+
+              <div class="alert err" id="submitErr"></div>
+              <div class="alert ok" id="submitOk"></div>
+              <div class="alert warn" id="submitWarn"></div>
+            </div>
+
+            <div class="col">
+              <h3 style="margin:0;">รายการล่าสุด</h3>
+              <div class="muted" style="font-size:13px;">คลิกที่แถวเพื่อดูรายละเอียด</div>
+              <table class="table" id="tblBranch">
+                <thead>
+                  <tr>
+                    <th style="width:130px;">วันที่ส่ง</th>
+                    <th>สถานะ</th>
+                    <th style="width:120px; text-align:right;">ยอด</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <div class="muted" id="branchMeta" style="font-size:12px; margin-top:6px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin panel -->
+        <div id="adminPanel" style="display:none;">
+          <h3 style="margin:0 0 10px;">แอดมิน: จัดการรายการ</h3>
+
+          <div class="kv">
+            <div class="kpi"><div class="k">ทั้งหมด (สแกนล่าสุด)</div><div class="v" id="kAll">0</div></div>
+            <div class="kpi"><div class="k">รอดำเนินการ</div><div class="v" id="kPending">0</div></div>
+            <div class="kpi"><div class="k">อนุมัติ/เสร็จสิ้น</div><div class="v" id="kDone">0</div></div>
+            <div class="kpi"><div class="k">ไม่อนุมัติ/อื่น ๆ</div><div class="v" id="kOther">0</div></div>
+          </div>
+
+          <div class="sp"></div>
+
+          <div class="modal-grid">
+            <div class="col">
+              <label>ตัวกรอง</label>
+              <div class="row">
+                <select id="fStatus">
+                  <option value="">สถานะ: ทั้งหมด</option>
+                  <option value="รอดำเนินการ">รอดำเนินการ</option>
+                  <option value="อนุมัติ">อนุมัติ</option>
+                  <option value="จ่ายแล้ว">จ่ายแล้ว</option>
+                  <option value="ไม่อนุมัติ">ไม่อนุมัติ</option>
+                </select>
+                <input id="fBranch" placeholder="รหัสสาขา (ถ้าต้องการ)" />
+              </div>
+
+              <div class="row">
+                <input id="fCycleKey" placeholder="cycleKey (ถ้าต้องการ) เช่น 2026-02" />
+                <button class="btn" id="btnFilter">ค้นหา</button>
+              </div>
+
+              <div class="alert err" id="adminErr"></div>
+              <div class="alert ok" id="adminOk"></div>
+            </div>
+
+            <div class="col">
+              <h3 style="margin:0;">จัดการรอบเบิก (CYCLE_MASTER)</h3>
+              <div class="row">
+                <button class="btn ghost" id="btnLoadCycles">โหลดรอบ</button>
+                <button class="btn ghost" id="btnGen12">สร้าง 12 เดือน</button>
+                <button class="btn" id="btnSaveCycles">บันทึกรอบ</button>
+              </div>
+              <div class="muted" style="font-size:12px; margin-top:6px;">
+                * แก้ชื่อ/วันที่/เปิด-ปิดได้ แล้วกด “บันทึกรอบ”
+              </div>
+
+              <div style="max-height:240px; overflow:auto; border:1px solid var(--line); border-radius:14px; margin-top:8px;">
+                <table class="table" id="tblCycles" style="margin-top:0; border:0;">
+                  <thead>
+                    <tr>
+                      <th style="width:110px;">cycleKey</th>
+                      <th>ชื่อรอบ</th>
+                      <th style="width:120px;">เริ่ม</th>
+                      <th style="width:120px;">จบ</th>
+                      <th style="width:80px;">เปิด</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="sp"></div>
+
+          <table class="table" id="tblAdmin">
+            <thead>
+              <tr>
+                <th style="width:150px;">วันที่ส่ง</th>
+                <th style="width:95px;">สาขา</th>
+                <th>ชื่อผู้เบิก</th>
+                <th style="width:120px; text-align:right;">ยอด</th>
+                <th style="width:140px;">สถานะ</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+
+          <div class="muted" id="adminMeta" style="font-size:12px; margin-top:6px;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SIDE -->
+    <div class="card side">
+      <h3>คู่มือเร็ว ✨</h3>
+      <div class="muted" style="font-size:14px; line-height:1.5;">
+        <b>1)</b> วาง URL Web App (ลงท้ายด้วย <code>/exec</code>)<br/>
+        <b>2)</b> ใส่รหัสสาขา (รองรับ 4–6 หลัก) หรือรหัสแอดมิน<br/>
+        <b>3)</b> ระบบจะดึง “ชื่อรอบเบิก” จาก <code>CYCLE_MASTER</code><br/>
+        <b>4)</b> สาขาส่งได้เมื่อรอบ “เปิดใช้งาน” เท่านั้น<br/><br/>
+        <span class="muted">หมายเหตุ:</span> การส่งรูปผ่าน JSONP มีข้อจำกัดความยาว URL — หน้าเว็บจะบีบอัดภาพให้เบาโดยอัตโนมัติ
+      </div>
+
+      <div class="hr"></div>
+
+      <h3>ตั้งค่าแนะนำ ✅</h3>
+      <ul class="muted" style="margin:0; padding-left:18px; line-height:1.65;">
+        <li>ตั้ง <b>BRANCH_MASTER!A</b> เป็น <b>Plain text</b></li>
+        <li>ใน <b>CYCLE_MASTER</b> แนะนำให้ใช้วันที่เป็น Date จริง หรือรูปแบบ <b>dd/MM/yyyy</b></li>
+        <li>Deploy Web App: Execute as <b>Me</b> และ Access <b>Anyone with the link</b></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-back" id="modalBack">
+    <div class="modal">
+      <div class="modal-head">
+        <b id="modalTitle">รายละเอียด</b>
+        <button class="modal-close" id="modalClose">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div class="col">
+            <div><b>ID:</b> <span id="mId" class="muted"></span></div>
+            <div><b>สาขา:</b> <span id="mBranch" class="muted"></span></div>
+            <div><b>ผู้เบิก:</b> <span id="mName" class="muted"></span></div>
+            <div><b>ยอด:</b> <span id="mAmount" class="muted"></span></div>
+            <div><b>สถานะ:</b> <span id="mStatus" class="muted"></span></div>
+            <div><b>รอบ:</b> <span id="mCycle" class="muted"></span></div>
+            <div><b>เวลาส่ง:</b> <span id="mSubmitted" class="muted"></span></div>
+          </div>
+          <div class="col">
+            <label>หมายเหตุ</label>
+            <textarea id="mNote" readonly></textarea>
+
+            <div id="adminActions" style="display:none;">
+              <label>แก้สถานะ (แอดมิน)</label>
+              <select id="mStatusSel">
+                <option value="รอดำเนินการ">รอดำเนินการ</option>
+                <option value="อนุมัติ">อนุมัติ</option>
+                <option value="จ่ายแล้ว">จ่ายแล้ว</option>
+                <option value="ไม่อนุมัติ">ไม่อนุมัติ</option>
+              </select>
+
+              <div class="row">
+                <button class="btn" id="btnUpdateStatus">บันทึกสถานะ</button>
+                <button class="btn danger" id="btnDeleteClaim">ลบรายการ</button>
+              </div>
+
+              <div class="alert err" id="modalErr"></div>
+              <div class="alert ok" id="modalOk"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+        <div><b>รูปประกอบ:</b></div>
+        <div class="imgs" id="mImgs"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================
+   Utilities
+========================= */
+const $ = (id) => document.getElementById(id);
+const LS = {
+  apiUrl: 'MEETCLAIM_API_URL',
+  lastCode: 'MEETCLAIM_LAST_CODE',
+};
+
+function setAlert(el, type, msg){
+  el.className = 'alert ' + type + (msg ? ' show' : '');
+  el.textContent = msg || '';
+}
+
+function canonCode(x){
+  if (x === null || x === undefined) return '';
+  let s = String(x).trim();
+  if (/^\d+(\.0+)?$/.test(s)) s = s.replace(/\.0+$/, '');
+  return s;
+}
+
+function b64EncodeUnicode(str){
+  // UTF-8 safe base64
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+
+function jsonpCall(apiBase, fn, args){
+  return new Promise((resolve) => {
+    const cb = 'cb_' + Math.random().toString(16).slice(2);
+    const urlBase = apiBase.replace(/\/+$/,'');
+    const url = urlBase + '?fn=' + encodeURIComponent(fn)
+      + '&args=' + encodeURIComponent(b64EncodeUnicode(JSON.stringify(args || [])))
+      + '&callback=' + cb;
+
+    // basic URL length guard
+    if (url.length > 180000) {
+      resolve({ ok:false, error:'URL_TOO_LONG', message:'ข้อมูลยาวเกินไป (รูปอาจใหญ่เกิน) ลองลดจำนวนรูป/ภาพเล็กลง' });
+      return;
+    }
+
+    const s = document.createElement('script');
+    s.src = url;
+
+    window[cb] = (data) => {
+      try { resolve(data); }
+      finally {
+        try { delete window[cb]; } catch(e){}
+        s.remove();
+      }
+    };
+
+    s.onerror = () => {
+      try { delete window[cb]; } catch(e){}
+      s.remove();
+      resolve({ ok:false, error:'NETWORK', message:'เรียก API ไม่สำเร็จ (ตรวจ URL / Deploy / สิทธิ์การเข้าถึง)' });
+    };
+
+    document.body.appendChild(s);
+  });
+}
+
+function badgeHtml(status){
+  const s = String(status || '');
+  if (s.includes('รอดำเนิน')) return '<span class="badge b-pending">รอดำเนินการ</span>';
+  if (s.includes('จ่าย') || s.includes('อนุมัติ') || s.includes('เสร็จ')) return `<span class="badge b-done">${escapeHtml(s)}</span>`;
+  if (s.includes('ไม่อนุมัติ') || s.includes('ปฏิเสธ')) return `<span class="badge b-reject">${escapeHtml(s)}</span>`;
+  if (!s) return '<span class="badge b-other">-</span>';
+  return `<span class="badge b-other">${escapeHtml(s)}</span>`;
+}
+
+function fmtMoney(x){
+  const n = Number(x);
+  if (!isFinite(n)) return '-';
+  return n.toLocaleString('th-TH') + ' บาท';
+}
+
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
+
+/* =========================
+   Image compression (client)
+========================= */
+async function fileToCompressedJpegBase64(file, maxW=1280, maxH=1280, quality=0.75){
+  const dataUrl = await new Promise((res, rej)=>{
+    const fr = new FileReader();
+    fr.onload = () => res(fr.result);
+    fr.onerror = rej;
+    fr.readAsDataURL(file);
+  });
+
+  const img = await new Promise((res, rej)=>{
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = rej;
+    im.src = dataUrl;
+  });
+
+  const w0 = img.naturalWidth || img.width;
+  const h0 = img.naturalHeight || img.height;
+  let w = w0, h = h0;
+
+  const scale = Math.min(1, maxW / w0, maxH / h0);
+  w = Math.round(w0 * scale);
+  h = Math.round(h0 * scale);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, w, h);
+
+  const outUrl = canvas.toDataURL('image/jpeg', quality);
+  const b64 = outUrl.split(',')[1] || '';
+  return b64;
+}
+
+/* =========================
+   State
+========================= */
+let STATE = {
+  apiUrl: '',
+  role: '',
+  user: null,
+  cycle: null,
+  claims: [],
+  images: [], // {name,mimeType,base64,previewUrl}
+  lastOpenClaimId: null
+};
+
+function loadSettings(){
+  const api = localStorage.getItem(LS.apiUrl) || '';
+  const code = localStorage.getItem(LS.lastCode) || '';
+  $('apiUrl').value = api;
+  $('loginCode').value = code;
+  $('verText').textContent = 'Version 1.0 (HTML)';
+}
+function saveSettings(){
+  localStorage.setItem(LS.apiUrl, $('apiUrl').value.trim());
+  localStorage.setItem(LS.lastCode, $('loginCode').value.trim());
+}
+
+/* =========================
+   App flow
+========================= */
+async function login(){
+  saveSettings();
+  const apiUrl = $('apiUrl').value.trim();
+  const code = canonCode($('loginCode').value);
+
+  setAlert($('loginErr'),'err','');
+  setAlert($('loginOk'),'ok','');
+
+  if(!apiUrl || !apiUrl.includes('/exec')){
+    setAlert($('loginErr'),'err','กรุณาวาง URL Web App ที่ลงท้ายด้วย /exec');
+    return;
+  }
+  if(!code){
+    setAlert($('loginErr'),'err','กรุณากรอกรหัสสาขาหรือรหัสแอดมิน');
+    return;
+  }
+
+  $('btnLogin').disabled = true;
+  $('btnLogin').textContent = 'กำลังเข้าสู่ระบบ...';
+
+  const res = await jsonpCall(apiUrl, 'apiLogin', [code]);
+
+  $('btnLogin').disabled = false;
+  $('btnLogin').textContent = 'เข้าสู่ระบบ';
+
+  if(!res || !res.ok){
+    const msg = (res && (res.message || res.detail || res.error)) ? (res.message || res.detail || res.error) : 'เข้าสู่ระบบไม่สำเร็จ';
+    setAlert($('loginErr'),'err', msg);
+    return;
+  }
+
+  STATE.apiUrl = apiUrl;
+  STATE.role = res.role;
+  STATE.user = res.user;
+
+  setAlert($('loginOk'),'ok', 'เข้าสู่ระบบสำเร็จ ✅');
+
+  $('loginView').style.display = 'none';
+  $('appView').style.display = 'block';
+
+  $('userName').textContent = res.user?.name || '-';
+  $('userRole').textContent = res.role === 'admin' ? 'admin' : 'branch';
+
+  await reloadAll();
+}
+
+async function reloadAll(){
+  setAlert($('submitErr'),'err',''); setAlert($('submitOk'),'ok',''); setAlert($('submitWarn'),'warn','');
+  setAlert($('adminErr'),'err',''); setAlert($('adminOk'),'ok','');
+
+  // Cycle
+  const cyc = await jsonpCall(STATE.apiUrl, 'apiGetCurrentCycle', []);
+  if(cyc && cyc.ok){
+    STATE.cycle = cyc.cycle || null;
+    $('cycleName').textContent = STATE.cycle?.cycleName || 'ไม่พบรอบ (ให้แอดมินตั้งค่า)';
+  } else {
+    STATE.cycle = null;
+    $('cycleName').textContent = 'โหลดรอบไม่สำเร็จ';
+  }
+
+  if(STATE.role === 'branch'){
+    $('branchPanel').style.display = 'block';
+    $('adminPanel').style.display = 'none';
+    await loadClaimsBranch();
+  } else {
+    $('branchPanel').style.display = 'none';
+    $('adminPanel').style.display = 'block';
+    await loadClaimsAdmin();
+  }
+}
+
+function logout(){
+  STATE = { apiUrl:'', role:'', user:null, cycle:null, claims:[], images:[], lastOpenClaimId:null };
+  $('appView').style.display = 'none';
+  $('loginView').style.display = 'block';
+
+  $('userName').textContent = '-';
+  $('userRole').textContent = '-';
+  $('cycleName').textContent = '-';
+
+  clearForm(true);
+}
+
+function statusToBadgeClass(s){
+  const t = String(s||'');
+  if (t.includes('รอดำเนิน')) return 'b-pending';
+  if (t.includes('จ่าย') || t.includes('อนุมัติ') || t.includes('เสร็จ')) return 'b-done';
+  if (t.includes('ไม่อนุมัติ') || t.includes('ปฏิเสธ')) return 'b-reject';
+  return 'b-other';
+}
+
+/* =========================
+   Claims: Branch
+========================= */
+async function loadClaimsBranch(){
+  const code = canonCode(STATE.user?.branchCode || '');
+  const res = await jsonpCall(STATE.apiUrl, 'apiListClaimsLite', ['branch', code, { limit: 200, offset: 0 }]);
+
+  const tbody = $('tblBranch').querySelector('tbody');
+  tbody.innerHTML = '';
+
+  if(!res || !res.ok){
+    $('branchMeta').textContent = 'โหลดรายการไม่สำเร็จ';
+    return;
+  }
+
+  STATE.claims = res.claims || [];
+  $('branchMeta').textContent = `คืนค่า ${res.meta?.returned ?? STATE.claims.length} รายการ (สแกน ${res.meta?.scannedRows ?? '-'} แถวล่าสุด)`;
+
+  STATE.claims.slice(0, 30).forEach(c=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(String(c.submittedAt||'').slice(0,19).replace('T',' '))}</td>
+      <td>${badgeHtml(c.status)}</td>
+      <td style="text-align:right;">${escapeHtml(fmtMoney(c.amount))}</td>
+    `;
+    tr.onclick = () => openClaim(c.id);
+    tbody.appendChild(tr);
+  });
+}
+
+/* =========================
+   Claims: Admin
+========================= */
+async function loadClaimsAdmin(filters){
+  const code = String(STATE.user?.adminCode || '').trim();
+  const f = filters || {
+    status: $('fStatus').value || '',
+    branchCode: canonCode($('fBranch').value || ''),
+    cycleKey: String($('fCycleKey').value || '').trim(),
+    limit: 300,
+    offset: 0
+  };
+
+  const res = await jsonpCall(STATE.apiUrl, 'apiListClaimsLite', ['admin', code, f]);
+
+  const tbody = $('tblAdmin').querySelector('tbody');
+  tbody.innerHTML = '';
+
+  if(!res || !res.ok){
+    const msg = (res && (res.message || res.detail || res.error)) ? (res.message || res.detail || res.error) : 'โหลดรายการไม่สำเร็จ';
+    setAlert($('adminErr'),'err', msg);
+    return;
+  }
+
+  setAlert($('adminErr'),'err','');
+  setAlert($('adminOk'),'ok','โหลดสำเร็จ ✅');
+
+  STATE.claims = res.claims || [];
+  $('adminMeta').textContent = `คืนค่า ${res.meta?.returned ?? STATE.claims.length} รายการ (สแกน ${res.meta?.scannedRows ?? '-'} แถวล่าสุด)`;
+
+  // KPI (จากชุดข้อมูลที่คืนมา)
+  const all = STATE.claims.length;
+  const pending = STATE.claims.filter(x=>String(x.status||'').includes('รอดำเนิน')).length;
+  const done = STATE.claims.filter(x=>String(x.status||'').includes('จ่าย') || String(x.status||'').includes('อนุมัติ') || String(x.status||'').includes('เสร็จ')).length;
+  const other = all - pending - done;
+
+  $('kAll').textContent = all.toLocaleString('th-TH');
+  $('kPending').textContent = pending.toLocaleString('th-TH');
+  $('kDone').textContent = done.toLocaleString('th-TH');
+  $('kOther').textContent = other.toLocaleString('th-TH');
+
+  STATE.claims.forEach(c=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(String(c.submittedAt||'').slice(0,19).replace('T',' '))}</td>
+      <td>${escapeHtml(c.branchCode || '')}</td>
+      <td>${escapeHtml(c.claimantName || '')}</td>
+      <td style="text-align:right;">${escapeHtml(fmtMoney(c.amount))}</td>
+      <td>${badgeHtml(c.status)}</td>
+    `;
+    tr.onclick = () => openClaim(c.id);
+    tbody.appendChild(tr);
+  });
+}
+
+async function openClaim(id){
+  $('modalBack').classList.add('show');
+  setAlert($('modalErr'),'err',''); setAlert($('modalOk'),'ok','');
+  $('mImgs').innerHTML = '';
+  $('mNote').value = '';
+  $('mStatusSel').value = 'รอดำเนินการ';
+
+  STATE.lastOpenClaimId = id;
+
+  const mode = STATE.role === 'admin' ? 'admin' : 'branch';
+  const requester = STATE.role === 'admin' ? String(STATE.user?.adminCode||'') : String(STATE.user?.branchCode||'');
+  const res = await jsonpCall(STATE.apiUrl, 'apiGetClaimDetail', [mode, requester, id]);
+
+  if(!res || !res.ok){
+    setAlert($('modalErr'),'err', res?.message || res?.detail || res?.error || 'โหลดรายละเอียดไม่สำเร็จ');
+    return;
+  }
+
+  const c = res.claim || {};
+  $('modalTitle').textContent = 'รายละเอียดรายการ';
+  $('mId').textContent = c.id || '';
+  $('mBranch').textContent = (c.branchCode || '') + ' ' + (c.branchName ? '('+c.branchName+')' : '');
+  $('mName').textContent = c.claimantName || '';
+  $('mAmount').textContent = fmtMoney(c.amount);
+  $('mStatus').textContent = c.status || '';
+  $('mCycle').textContent = (c.cycleName || c.cycleKey || '');
+  $('mSubmitted').textContent = String(c.submittedAt || '').slice(0,19).replace('T',' ');
+  $('mNote').value = c.note || '';
+
+  if(Array.isArray(c.imageUrls) && c.imageUrls.length){
+    c.imageUrls.forEach(u=>{
+      const div = document.createElement('div');
+      div.className = 'thumb';
+      const a = document.createElement('a');
+      a.href = u;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      const im = document.createElement('img');
+      im.src = u;
+      a.appendChild(im);
+      div.appendChild(a);
+      $('mImgs').appendChild(div);
+    });
+  } else {
+    $('mImgs').innerHTML = '<div class="muted">ไม่มีรูป</div>';
+  }
+
+  if(STATE.role === 'admin'){
+    $('adminActions').style.display = 'block';
+    $('mStatusSel').value = c.status || 'รอดำเนินการ';
+  } else {
+    $('adminActions').style.display = 'none';
+  }
+}
+
+function closeModal(){
+  $('modalBack').classList.remove('show');
+}
+
+/* =========================
+   Submit claim (branch)
+========================= */
+function renderImgPreview(){
+  const wrap = $('imgPreview');
+  wrap.innerHTML = '';
+  STATE.images.forEach((it, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'thumb';
+    div.innerHTML = `<img src="${it.previewUrl}" alt="img">`;
+    const btn = document.createElement('button');
+    btn.textContent = '×';
+    btn.onclick = () => {
+      STATE.images.splice(idx,1);
+      renderImgPreview();
+    };
+    div.appendChild(btn);
+    wrap.appendChild(div);
+  });
+}
+
+async function onPickImages(ev){
+  const files = Array.from(ev.target.files || []);
+  if(!files.length) return;
+
+  // cap 3 images
+  const remain = Math.max(0, 3 - STATE.images.length);
+  if(remain <= 0){
+    setAlert($('submitWarn'),'warn','เลือกได้ไม่เกิน 3 รูป');
+    ev.target.value = '';
+    return;
+  }
+  const pick = files.slice(0, remain);
+
+  setAlert($('submitWarn'),'warn','กำลังบีบอัดรูป...');
+  for(const f of pick){
+    const b64 = await fileToCompressedJpegBase64(f, 1280, 1280, 0.72);
+    const previewUrl = 'data:image/jpeg;base64,' + b64;
+    // guard: ถ้าใหญ่เกิน (กัน URL ยาว)
+    if (b64.length > 220000) {
+      setAlert($('submitWarn'),'warn','รูปใหญ่เกินไป ระบบลดแล้วแต่ยังใหญ่ (ลองถ่ายใกล้/ลดความละเอียด)');
+    }
+    STATE.images.push({
+      name: f.name || 'image.jpg',
+      mimeType: 'image/jpeg',
+      base64: b64,
+      previewUrl
+    });
+  }
+  setAlert($('submitWarn'),'warn','');
+  renderImgPreview();
+  ev.target.value = '';
+}
+
+function clearForm(silent=false){
+  $('claimantName').value = '';
+  $('amount').value = '';
+  $('note').value = '';
+  STATE.images = [];
+  $('imgInput').value = '';
+  renderImgPreview();
+  if(!silent){
+    setAlert($('submitErr'),'err','');
+    setAlert($('submitOk'),'ok','ล้างฟอร์มแล้ว ✅');
+    setAlert($('submitWarn'),'warn','');
+  }
+}
+
+async function submitClaim(){
+  setAlert($('submitErr'),'err','');
+  setAlert($('submitOk'),'ok','');
+  setAlert($('submitWarn'),'warn','');
+
+  const branchCode = canonCode(STATE.user?.branchCode || '');
+  const claimantName = String($('claimantName').value || '').trim();
+  const amount = Number(String($('amount').value || '').replace(/,/g,''));
+  const note = String($('note').value || '').trim();
+
+  if(!claimantName){
+    setAlert($('submitErr'),'err','กรุณากรอกชื่อผู้เบิก');
+    return;
+  }
+  if(!(amount > 0)){
+    setAlert($('submitErr'),'err','กรุณากรอกจำนวนเงินให้ถูกต้อง');
+    return;
+  }
+
+  $('btnSubmit').disabled = true;
+  $('btnSubmit').textContent = 'กำลังส่ง...';
+
+  const payload = {
+    branchCode,
+    claimantName,
+    amount,
+    note,
+    images: STATE.images.map(x=>({ name:x.name, mimeType:x.mimeType, base64:x.base64 }))
+  };
+
+  const res = await jsonpCall(STATE.apiUrl, 'apiSubmitClaim', [payload]);
+
+  $('btnSubmit').disabled = false;
+  $('btnSubmit').textContent = 'ส่งเอกสาร';
+
+  if(!res || !res.ok){
+    const msg = res?.message || res?.detail || res?.error || 'ส่งเอกสารไม่สำเร็จ';
+    setAlert($('submitErr'),'err', msg);
+    return;
+  }
+
+  setAlert($('submitOk'),'ok', `ส่งสำเร็จ ✅ ID: ${res.claim?.id || '-'}`);
+  clearForm(true);
+  await loadClaimsBranch();
+}
+
+/* =========================
+   Admin actions: Update / Delete
+========================= */
+async function updateStatus(){
+  const id = STATE.lastOpenClaimId;
+  if(!id) return;
+  const newStatus = $('mStatusSel').value;
+  const adminCode = String(STATE.user?.adminCode || '').trim();
+
+  setAlert($('modalErr'),'err',''); setAlert($('modalOk'),'ok','');
+
+  $('btnUpdateStatus').disabled = true;
+  const res = await jsonpCall(STATE.apiUrl, 'apiUpdateClaim', [adminCode, id, { status: newStatus }]);
+  $('btnUpdateStatus').disabled = false;
+
+  if(!res || !res.ok){
+    setAlert($('modalErr'),'err', res?.message || res?.detail || res?.error || 'อัปเดตไม่สำเร็จ');
+    return;
+  }
+  setAlert($('modalOk'),'ok','บันทึกสถานะแล้ว ✅');
+  await loadClaimsAdmin();
+}
+
+async function deleteClaim(){
+  const id = STATE.lastOpenClaimId;
+  if(!id) return;
+  const adminCode = String(STATE.user?.adminCode || '').trim();
+  if(!confirm('ยืนยันลบรายการนี้? (ไฟล์รูปจะถูกย้ายไปถังขยะ)')) return;
+
+  setAlert($('modalErr'),'err',''); setAlert($('modalOk'),'ok','');
+
+  $('btnDeleteClaim').disabled = true;
+  const res = await jsonpCall(STATE.apiUrl, 'apiDeleteClaim', [adminCode, id]);
+  $('btnDeleteClaim').disabled = false;
+
+  if(!res || !res.ok){
+    setAlert($('modalErr'),'err', res?.message || res?.detail || res?.error || 'ลบไม่สำเร็จ');
+    return;
+  }
+
+  setAlert($('modalOk'),'ok', `ลบแล้ว ✅ (รูป ${res.deletedFileCount ?? 0} ไฟล์)`);
+  await loadClaimsAdmin();
+  setTimeout(()=>closeModal(), 450);
+}
+
+/* =========================
+   Admin: Cycle management UI
+========================= */
+function cycleRowTpl(c){
+  const key = escapeHtml(c.cycleKey || '');
+  const name = escapeHtml(c.cycleName || '');
+  const sd = escapeHtml(c.startDate || '');
+  const ed = escapeHtml(c.endDate || '');
+  const open = !!c.isOpen;
+
+  return `
+    <tr>
+      <td><input class="cy-key" value="${key}" readonly></td>
+      <td><input class="cy-name" value="${name}"></td>
+      <td><input class="cy-sd" value="${sd}" placeholder="yyyy-mm-dd หรือ dd/mm/yyyy"></td>
+      <td><input class="cy-ed" value="${ed}" placeholder="yyyy-mm-dd หรือ dd/mm/yyyy"></td>
+      <td style="text-align:center;"><input class="cy-open" type="checkbox" ${open ? 'checked':''}></td>
+    </tr>
+  `;
+}
+
+async function loadCycles(){
+  const adminCode = String(STATE.user?.adminCode || '').trim();
+  const res = await jsonpCall(STATE.apiUrl, 'apiListCycles', [adminCode]);
+  if(!res || !res.ok){
+    setAlert($('adminErr'),'err', res?.message || res?.detail || res?.error || 'โหลดรอบไม่สำเร็จ');
+    return;
+  }
+  setAlert($('adminErr'),'err','');
+  const tbody = $('tblCycles').querySelector('tbody');
+  tbody.innerHTML = '';
+  (res.cycles || []).forEach(c=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = cycleRowTpl(c);
+    tbody.appendChild(tr);
+  });
+  setAlert($('adminOk'),'ok','โหลดรอบแล้ว ✅');
+}
+
+function readCyclesFromUI(){
+  const rows = Array.from($('tblCycles').querySelectorAll('tbody tr'));
+  return rows.map(r=>{
+    const key = r.querySelector('.cy-key')?.value?.trim() || '';
+    return {
+      cycleKey: key,
+      cycleName: r.querySelector('.cy-name')?.value?.trim() || key,
+      startDate: r.querySelector('.cy-sd')?.value?.trim() || '',
+      endDate: r.querySelector('.cy-ed')?.value?.trim() || '',
+      isOpen: !!r.querySelector('.cy-open')?.checked,
+      note: ''
+    };
+  }).filter(x=>x.cycleKey);
+}
+
+async function saveCycles(){
+  const adminCode = String(STATE.user?.adminCode || '').trim();
+  const cycles = readCyclesFromUI();
+  const res = await jsonpCall(STATE.apiUrl, 'apiUpsertCycles', [adminCode, cycles]);
+  if(!res || !res.ok){
+    setAlert($('adminErr'),'err', res?.message || res?.detail || res?.error || 'บันทึกรอบไม่สำเร็จ');
+    return;
+  }
+  setAlert($('adminErr'),'err','');
+  setAlert($('adminOk'),'ok','บันทึกรอบแล้ว ✅');
+  await reloadAll();
+}
+
+async function gen12(){
+  const adminCode = String(STATE.user?.adminCode || '').trim();
+  const res = await jsonpCall(STATE.apiUrl, 'apiGenerate12Months', [adminCode]);
+  if(!res || !res.ok){
+    setAlert($('adminErr'),'err', res?.message || res?.detail || res?.error || 'สร้าง 12 เดือนไม่สำเร็จ');
+    return;
+  }
+  setAlert($('adminErr'),'err','');
+  setAlert($('adminOk'),'ok', `สร้างเพิ่ม ${res.created ?? 0} รอบ ✅`);
+  await loadCycles();
+  await reloadAll();
+}
+
+/* =========================
+   Events
+========================= */
+$('btnLogin').addEventListener('click', login);
+$('btnLogout').addEventListener('click', logout);
+$('btnReload').addEventListener('click', reloadAll);
+
+$('imgInput').addEventListener('change', onPickImages);
+$('btnClearForm').addEventListener('click', ()=>clearForm(false));
+$('btnSubmit').addEventListener('click', submitClaim);
+
+$('modalClose').addEventListener('click', closeModal);
+$('modalBack').addEventListener('click', (e)=>{ if(e.target === $('modalBack')) closeModal(); });
+
+$('btnUpdateStatus').addEventListener('click', updateStatus);
+$('btnDeleteClaim').addEventListener('click', deleteClaim);
+
+$('btnFilter').addEventListener('click', ()=>loadClaimsAdmin());
+$('btnLoadCycles').addEventListener('click', loadCycles);
+$('btnSaveCycles').addEventListener('click', saveCycles);
+$('btnGen12').addEventListener('click', gen12);
+
+// Enter key on login
+$('loginCode').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') login(); });
+
+loadSettings();
+</script>
+</body>
+</html>
